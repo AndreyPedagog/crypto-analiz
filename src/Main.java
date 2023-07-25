@@ -94,9 +94,40 @@ public class Main {
             try {
 
                 Path encryptFile = Path.of(scanner.nextLine());
+                String encryptFileText = Files.readString(encryptFile, StandardCharsets.UTF_8);
 
-                String encryptFile2 = Files.readString(encryptFile, StandardCharsets.UTF_8);
-                bruteForceDecrypt(encryptFile2);
+                System.out.println("Напишіть шлях до файлу перевірки, який ви завантажили: ");
+
+                Path dictionaryPath = Path.of(scanner.nextLine());
+                List<String> dictionaryWords = Files.readAllLines(dictionaryPath, StandardCharsets.UTF_8);
+
+                boolean found = false;
+
+                for (int key = 1; key < ukrainianAlphabet.size(); key++) {
+                    String decryptedFile = decrypt(encryptFileText, key);
+
+                    String[] words = decryptedFile.split("\\s+");
+
+                    for (String word : words) {
+                        if (dictionaryWords.contains(word.toLowerCase())) {
+                            System.out.println("Знайдено можливий ключ: " + key);
+                            System.out.println("Розшифрований текст файлу: " + decryptedFile);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    System.out.println("Слово не знайдено в словнику.");
+                }
+
+
+                bruteForceDecrypt(encryptFileText);
 
                 break;
 
@@ -145,7 +176,7 @@ public class Main {
         for (int key = 1; key < ukrainianAlphabet.size(); key++) {
                 String decryptedFile = decrypt(decryptFile, key);
                 if (decryptedFile.contains(" ")) {
-                    System.out.println("Знайдено можливий ключ: " + key);
+                    System.out.println("Знайдено другий можливий ключ: " + key);
                     System.out.println("Розшифрований текст файлу: " + decryptedFile);
                     break;
                 }
